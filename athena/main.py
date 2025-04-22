@@ -4,19 +4,24 @@ import time
 athena_client = boto3.client('athena',region_name='us-east-1')
 
 database_name = 'athena_database'
-table_name = 'your_table'
+table_name = 'AddressTable'
 s3_output = 's3://my-athena-query-results-p64/'  # Athena query results go here
 data_location = 's3://curated-zone-p64/'  # Path where your CSV files are
 
 query = f"""
 CREATE EXTERNAL TABLE IF NOT EXISTS {database_name}.{table_name} (
-    id INT,
-    name STRING,
-    age INT
-)
+id INT,
+  street STRING,
+  unused_col STRING,
+  city STRING,
+  zone INT,
+  postal_code STRING,
+  location_hash STRING,
+  uuid STRING,
+  created_at TIMESTAMP)
 ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
 WITH SERDEPROPERTIES (
-    'serialization.format' = ','
+    'serialization.format' = '\t'
 ) 
 STORED AS TEXTFILE
 LOCATION '{data_location}'
@@ -46,10 +51,11 @@ while state in ['RUNNING', 'QUEUED']:
 
 s3 = boto3.client('s3')
 
-csv_content = "id,namae,age\n1,Prayashah,25\n2,Ayash,23\n3,Leon,30"
+# csv_content = "id,namae,age\n1,Prayashah,25\n2,Ayash,23\n3,Leon,30"
 bucket = "curated-zone-p64"
 key = "curated-zone-p64/sample_data2.csv"  # This should match the Athena table LOCATION
 
-s3.put_object(Body=csv_content, Bucket=bucket, Key=key)
+with open("Address.csv", 'rb') as f:
+    s3.put_object(Body=f, Bucket=bucket, Key=key)
 print("Data written to S3.")
 

@@ -4,7 +4,7 @@ import time
 athena = boto3.client('athena', region_name='us-east-1')
 
 database = 'athena_database'
-query = 'SELECT * FROM your_table LIMIT 10;'
+query = """SELECT * FROM AddressTable  where city = 'Bothell' LIMIT 10;"""
 output_bucket = 's3://my-athena-query-results-p64/'  # Required for Athena
 
 # Start query execution
