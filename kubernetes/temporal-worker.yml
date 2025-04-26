@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: python-worker
+  namespace: monitoring
+spec:
+  selector:
+    app: python-worker
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-temporal-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-temporal-worker
+  template:
+    metadata:
+      labels:
+        app: python-temporal-worker
+    spec:
+      containers:
+      - name: python-temporal-worker
+        image: python-temporal-worker:latest
+        imagePullPolicy: Never
+        env:
+        - name: TEMPORAL_SERVER
+          value: "localhost:7233"  # Temporal server address inside cluster
