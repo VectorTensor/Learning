@@ -33,8 +33,19 @@ import asyncio
 from temporalio.client import Client
 from temporalio.worker import Worker
 
+
 async def main():
-    client = await Client.connect("localhost:7233")
+    retry  = True
+    while retry:
+        try:
+            client = await Client.connect("localhost:7233")
+        except Exception:
+            retry = True
+            continue
+        retry = False
+
+
+
 
     worker = Worker(
         client,
